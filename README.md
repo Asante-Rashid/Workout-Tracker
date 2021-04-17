@@ -14,3 +14,6 @@ The user should be able to:
   * View the combined weight of multiple exercises from the past seven workouts on the `stats` page.
 
   * View the total duration of each workout from the past seven workouts on the `stats` page.
+
+### Technology used
+Mongo database with a Mongoose schema and handle routes with Express
