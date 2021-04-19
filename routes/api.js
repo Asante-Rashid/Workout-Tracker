@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const mongojs = require("mongojs");
 const Exercise = require("../models/exercise.js");
 const Workout = require("../models/workout.js");
 
@@ -15,20 +16,43 @@ router.post("/api/workouts", ({ body }, res) => {
         });
 });
 
+// router.put("/api/workouts/:id", (req, res) => {
+//     Workout.findOneAndUpdate({ _id: req.params.id} ,
+//         {
+//             $push: { exercises: req.body }
+//         },
+//         { new: true })
+//         .then(dbExercise => {
+//             res.json(dbExercise);
+//         })
+//         .catch(err => {
+//             res.status(400).json(err);
+//             console.log(err)
+//         });
+// });
+
 router.put("/api/workouts/:id", ({ body }, res) => {
     Exercise.create(body)
-        .then(({ _id }) => Workout.findOneAndUpdate({}, { $push: { exercises: _id } }, { new: true }))
+        .then(({ _id }, req) =>
+            Workout.findOneAndUpdate({},
+                {
+                    $push: { exercises: _id }
+                },
+                {
+                    upsert: true,
+                    sort: { day: -1 },
+                }))
         .then(dbExercise => {
             res.json(dbExercise);
         })
         .catch(err => {
             res.status(400).json(err);
+            console.log(err)
         });
 });
 
 router.get("/api/workouts", (req, res) => {
     Workout.find({})
-        .sort({ date: -1 })
         .then(dbWorkout => {
             res.json(dbWorkout);
         })
@@ -38,7 +62,8 @@ router.get("/api/workouts", (req, res) => {
 });
 
 router.get("/api/workouts/range", (req, res) => {
-    Workout.find({})
+    Workout.find({}).limit(7)
+        // .populate("exercises")
         .sort({ date: -1 })
         .then(dbWorkout => {
             res.json(dbWorkout);
