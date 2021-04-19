@@ -53,6 +53,7 @@ router.put("/api/workouts/:id", ({ body }, res) => {
 
 router.get("/api/workouts", (req, res) => {
     Workout.find({})
+        // .populate("exercises")
         .then(dbWorkout => {
             res.json(dbWorkout);
         })
